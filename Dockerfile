@@ -12,6 +12,8 @@ RUN python -m bash_kernel.install
 RUN jupyter nbextension enable --py jupytext --sys-prefix
 RUN jupyter nbextension enable --py gmaps
 
+RUN pip install pyarrow
+
 USER jovyan
 
 #RUN python -m nltk.downloader all
