@@ -14,4 +14,4 @@ sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it
 VERSION=0.0.5
 JUPYTER_SOURCES=$HOME/sources/
  
-sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION /home/runner/notebooks/*.ipynb
+sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION run /home/runner/notebooks/pie.ipynb

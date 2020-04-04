@@ -31,9 +31,9 @@ run_notebook(){
     jupyter nbconvert --to html "$FILENAME"_out.ipynb
 }
 
-if [ "x$1" == "bash" ]; then
+if [ "x$1" == "xbash" ]; then
     exec $@
-elif [ "x$1" == "run" ]; then
+elif [ "x$1" == "xrun" ]; then
     start_jupyter_headless
     sleep 60
     run_notebook $@

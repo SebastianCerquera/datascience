@@ -18,6 +18,8 @@ RUN pip3 install pyarrow
 RUN curl https://gist.githubusercontent.com/tpogden/ec79f2ebe2baf45655445b575dc7f540/raw/b546d2cdad522c036ceee523524b785a18c716a0/run_notebooks.py > /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
+RUN pip3 install matplotlib matplotlib-venn
+
 COPY entrypoint.sh /opt/entrypoint.sh
 RUN chmod +x /opt/entrypoint.sh
 
