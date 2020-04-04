@@ -3,10 +3,22 @@
 PORT=8888
 RUNNER=runner
 
-start_jupyter(){    
-    mkdir -p $HOME/notebooks
+start_jupyter(){
+    if [ ! -d "$HOME/notebooks" ]; then
+        mkdir -p $HOME/notebooks
+    fi
+
     cd $HOME/notebooks
+}
+
+start_jupyter_gui(){    
+    start_jupyter
     jupyter notebook --no-browser --port=$PORT --ip='*'
+}
+
+start_jupyter_headless(){    
+    start_jupyter
+    jupyter notebook --no-browser --port=$PORT --ip='*' &
 }
 
 stop_jupyter(){
@@ -21,6 +33,10 @@ run_notebook(){
 
 if [ "x$1" == "bash" ]; then
     exec $@
+elif [ "x$1" == "run" ]; then
+    start_jupyter_headless
+    sleep 60
+    run_notebook $@
 else
-    start_jupyter
+    start_jupyter_gui
 fi

@@ -1,12 +1,17 @@
 # datascience
 
 ## build
-VERSION=0.0.4
+VERSION=0.0.5
 sudo docker build -t pandora/jupyter:$VERSION .
 
-## run
-VERSION=0.0.4
+## run jupyter GUI
+VERSION=0.0.5
 JUPYTER_SOURCES=$HOME/sources/
-sudo chmod  777 $JUPYTER_SOURCES
  
-sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/root/notebooks --rm -it pandora/jupyter:$VERSION
+sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION
+
+## eval notebook headless
+VERSION=0.0.5
+JUPYTER_SOURCES=$HOME/sources/
+ 
+sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION /home/runner/notebooks/*.ipynb
