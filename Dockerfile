@@ -1,19 +1,35 @@
-FROM jupyter/scipy-notebook
+FROM ubuntu:18.04
 
 USER root
 
-RUN apt-get update && apt-get install -y vim jq curl
+RUN apt-get update && apt-get install -y vim jq curl python3 python3-pip
 
-RUN pip install jupyter jupytext nltk catboost lightgbm xgboost imblearn graphviz bash_kernel awscli boto3 colour shapely python-dotenv
+RUN pip3 install jupyter jupytext nltk lightgbm imblearn graphviz bash_kernel awscli boto3 colour shapely python-dotenv
 
-RUN pip install gmaps
+RUN pip3 install gmaps
 
-RUN python -m bash_kernel.install
+RUN python3 -m bash_kernel.install
 RUN jupyter nbextension enable --py jupytext --sys-prefix
 RUN jupyter nbextension enable --py gmaps
+RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
-RUN pip install pyarrow
+RUN pip3 install pyarrow
 
-USER jovyan
+RUN curl https://gist.githubusercontent.com/tpogden/ec79f2ebe2baf45655445b575dc7f540/raw/b546d2cdad522c036ceee523524b785a18c716a0/run_notebooks.py > /opt/run_notebooks.py
+RUN chmod +x /opt/run_notebooks.py
 
-#RUN python -m nltk.downloader all
+COPY entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
+
+COPY utils.sh /opt/utils.sh
+RUN chmod +x /opt/utils.sh
+RUN /opt/utils.sh
+
+USER runner
+
+WORKDIR /tmp
+
+ENTRYPOINT ["/opt/entrypoint.sh"]
+CMD ["bash"]
+
+#RUN python3 -m nltk.downloader all
