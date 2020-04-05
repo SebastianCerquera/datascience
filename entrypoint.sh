@@ -27,7 +27,8 @@ stop_jupyter(){
 
 run_notebook(){
     local FILENAME=$1
-    python /opt/run_notebooks.py -t 900 $FILENAME.ipynb
+    touch "$FILENAME"_out.ipynb
+    python3 /opt/run_notebooks.py $FILENAME.ipynb
     jupyter nbconvert --to html "$FILENAME"_out.ipynb
 }
 
@@ -36,7 +37,7 @@ if [ "x$1" == "xbash" ]; then
 elif [ "x$1" == "xrun" ]; then
     start_jupyter_headless
     sleep 60
-    run_notebook $@
+    run_notebook $2
 else
     start_jupyter_gui
 fi
