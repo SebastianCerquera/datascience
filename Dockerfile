@@ -17,7 +17,7 @@ RUN pip3 install pyarrow
 
 RUN pip3 install matplotlib matplotlib-venn
 
-RUN pip3 install pandas numpy
+RUN pip3 install pandas numpy seaborn seasonal
 
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
