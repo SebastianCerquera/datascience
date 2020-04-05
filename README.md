@@ -10,10 +10,10 @@ sudo docker push thepandorasys/jupyter-tools:$VERSION
 VERSION=0.0.7
 JUPYTER_SOURCES=$HOME/sources/
  
-sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION
+sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it thepandorasys/jupyter:$VERSION
 
 ## eval notebook headless
 VERSION=0.0.7
 JUPYTER_SOURCES=$HOME/sources/
  
-sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it pandora/jupyter:$VERSION run /home/runner/notebooks/pie
+sudo docker run -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks --rm -it thepandorasys/jupyter:$VERSION run /home/runner/notebooks/pie
