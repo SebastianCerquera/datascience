@@ -1,0 +1,128 @@
+---
+jupyter:
+  jupytext:
+    formats: ipynb,Rmd
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.3.4
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import matplotlib
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+```{python}
+def compare_dist(src, dst):
+    fig, ax = plt.subplots(figsize=(14, 4))
+    sns.distplot(src, ax=ax)
+    sns.distplot(dst, ax=ax)
+```
+
+```{python}
+def compute_confidence_interval(data):
+    std = np.std(data)
+    mean = np.mean(data)
+    return [mean - std, mean + std]
+```
+
+```{python}
+def draw_interval_box(x, width, ax=None, y=0, hight=1, color="blue", alpha=1): 
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(14, 3))
+    p_bbox = matplotlib.patches.FancyBboxPatch((x, y),
+                            width, hight,
+                            boxstyle="square,pad=0.1",
+                            ec="k", fc=color, alpha=alpha, zorder=10.)
+    ax.set_xlim(-5, 5)
+    ax.add_patch(p_bbox)
+    
+def compare_intervals(samples, colors=["blue", "red"], alphas=[0.8, 0.2]):
+    fig = plt.figure(figsize=(14, 3))
+    size = len(samples)
+    for i in range(size):
+        ax = fig.add_subplot(1, 1, 1)
+        sample = compute_confidence_interval(samples[i])
+        draw_interval_box(sample[0], abs(sample[0] - sample[1]), 
+                          alpha=alphas[i], ax=ax, color=colors[i])
+```
+
+## Rechazar o aceptar la hipotesis nula basada en este metodo
+
+https://www.youtube.com/watch?v=d6MbyCmnsJo&feature=youtu.be
+    
+El solo calcula los intervalos de confianza de las 2 muestras y verfica que no se cruzan para así proceder a
+rechazarla.
+
+Para verificar su metodo voy a generar 2 muestras de una distribución normal con la misma media y sigma, las 2 poblaciones deberían ser iguales y por ende los intervalos de confianza también.
+
+```{python}
+def gen_normal_pair(mu=0, sigma=3, N=1000):
+    s1 = np.random.normal(mu, sigma, N)
+    s2 = np.random.normal(mu, sigma, N)
+    return [s1, s2]
+```
+
+## Inicio la prueba generando una mustra pequeña
+
+- 10 elementos
+
+```{python}
+sample_size = gen_normal_pair(N=10)
+```
+
+```{python}
+compare_dist(sample_size[0], sample_size[1])
+```
+
+```{python}
+compare_intervals(sample_size)
+```
+
+## Generando una mustra mediana
+
+- 100 elementos
+
+```{python}
+sample_size = gen_normal_pair(N=100)
+```
+
+```{python}
+compare_dist(sample_size[0], sample_size[1])
+```
+
+```{python}
+compare_intervals(sample_size)
+```
+
+```{python}
+
+```
+
+## Generando una mustra grande
+
+- 10000 elementos
+
+```{python}
+sample_size = gen_normal_pair(N=10000)
+```
+
+```{python}
+compare_dist(sample_size[0], sample_size[1])
+```
+
+```{python}
+compare_intervals(sample_size)
+```
+
+```{python}
+
+```
