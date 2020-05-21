@@ -118,3 +118,176 @@ compare_dist(sample_size[0], sample_size[1])
 ```{python}
 compare_intervals(sample_size)
 ```
+
+```{python}
+
+```
+
+# Rechazar o aceptar la hipotesis nula usando el p-vlaue
+
+Este video aunque esta enfocado a bio estadistica y da ejemplos de este tipo explica los conceptos de manera clara
+y simple: https://www.youtube.com/watch?v=YSwmpAmLV2s
+
+- Para el ejemplo voy a aplicar el test shapiro, shapiro busca determinar si una muestra tiene distribución normal.
+
+La hipotesis nula indica que la muestra viene de una distribución normal, la hipotesis alternativa que no.
+
+```{python}
+from scipy.stats import shapiro
+```
+
+```{python}
+def gen_normal(mu=0, sigma=3, N=1000):
+    s1 = np.random.normal(mu, sigma, N)
+    return s1
+
+def gen_uniform(mu=0, sigma=3, N=1000):
+    s1 = np.random.uniform(mu, sigma, N)
+    return s1
+
+def gen_binomial(p=0.5, n=10, N=1000):
+    s1 = np.random.binomial(n, p, N)
+    return s1
+
+def plot_shapiro_against_N(min_value=5, max_value=1000, f=gen_normal):
+    results = []
+    for i in range(min_value, max_value, 20):
+        results.append(np.concatenate([
+            [i], shapiro(f(N=i))
+        ]))
+    results = list(zip(*results))
+    plt.plot(results[0], results[1], color="blue", label="statistic")
+    plt.plot(results[0], results[2], color="green", label="p-value")
+```
+
+## NORMAL: Gráficar el p-value y el estadistico contra el número de muestras
+
+Contrario a lo que pense el p-value no mejora con el número de muestras, el estadistico en cambio converge a uno. Los valores del p-value cambian mucho durante cada ejecución.
+
+```{python}
+plot_shapiro_against_N()
+```
+
+```{python}
+plot_shapiro_against_N()
+```
+
+## UNIFORME: Gráficar el p-value y el estadistico contra el número de muestras
+
+Por otro lado el p-value de un distribución uniforme rapidamente converge a cero
+
+```{python}
+plot_shapiro_against_N(f=gen_uniform)
+```
+
+```{python}
+plot_shapiro_against_N(f=gen_uniform)
+```
+
+## BINOMIAL: Gráficar el p-value y el estadistico contra el número de muestras
+
+Por otro lado el p-value de un distribución uniforme rapidamente converge a cero
+
+```{python}
+plot_shapiro_against_N(f=gen_binomial)
+```
+
+```{python}
+plot_shapiro_against_N(f=gen_binomial)
+```
+
+## Gráficar la distribución del p-value
+
+```{python}
+STATISTICS = "Promedio: {}, Desviación estandar: {}"
+
+def plot_disitributions(data, title):
+    print(title + " --> " + STATISTICS.format(np.mean(data), np.std(data)))
+
+    fig = plt.figure(figsize=(14, 4))
+    fig.suptitle(title)
+    ax = fig.add_subplot(1, 2, 1)
+    ax.grid(color='r', linestyle='-', linewidth=0.5)
+    sns.distplot(data, ax=ax, bins=100)
+    
+    ax = fig.add_subplot(1, 2, 2)
+    ax.grid(color='r', linestyle='-', linewidth=0.5)
+    kwargs = {'cumulative': True}
+    sns.distplot(data, ax=ax, hist_kws=kwargs, kde_kws=kwargs, bins=100)
+    
+def plot_p_value_dist(N = 1000, k = 1000, f=gen_normal, plots=True):
+    a = list(map(lambda e: f(N=k), range(N)))
+    b = list(map(lambda e: shapiro(e), a))
+    c = list(zip(*a))
+    if plots:
+        plot_disitributions(c[1], "p-value distribution")
+        plot_disitributions(c[0], "statistic distribution")
+    return np.array(c[0])
+```
+
+### NORMAL: Gráficar la distribución del p-value
+
+```{python}
+statistic = plot_p_value_dist()
+```
+
+### UNIFORME: Gráficar la distribución del p-value
+
+```{python}
+statistic = plot_p_value_dist(f=gen_uniform)
+```
+
+### BINOMIAL: Gráficar la distribución del p-value
+
+```{python}
+statistic = plot_p_value_dist(f=gen_binomial)
+```
+
+## Se falla en rechazar la hipotesis Nula
+
+Para esta prueba se escoge un alfa de 0.05: Cual es la probabilidad de rechazar la hipotesis nula erroneamente?
+
+- Usando las funciones de arriba puedo generar una muestra grande del estadistico que calcula shapiro, si el alpha habla de la probabilidad de encontrar un estadistico irregular que nos haga pensar de forma erronea que la distribución NO es es normal, la irregularidad de este estadistico debería resaltar al momento de observar el histograma de esta muestra. 
+
+```{python}
+N = 1000
+sample = gen_normal(N)
+sample_shapiro = shapiro(sample)
+normal_statistic = plot_p_value_dist(f=gen_uniform, plots=False, N=10000)
+
+#bins = np.arange(min(normal_statistic), max(normal_statistic), (max(normal_statistic) - min(normal_statistic))/101)
+hist, bins = np.histogram(normal_statistic, bins=bins)
+```
+
+```{python}
+## El resultado indica que la hipotesis no se puede rechazar por ende se acepta que la distribucón es normal
+
+sample_shapiro
+```
+
+### El resultado del p-value es coherente con el histograma de estadisticos
+
+- Al igual que el p-value de shapiro la probabilidad de encontrar un estadistico al menos tan grande como el observado es mayor a 0.05
+
+```{python}
+## Probabilidad de encontrar un evento que es mayor que el estadistico en la muestra.
+
+x = np.where(bins[:-1] > sample_shapiro[0])
+np.sum(hist[x])/np.sum(hist)
+```
+
+```{python}
+## Probabilidad de encontrar un evento que es mayor que el estadistico en la muestra.
+
+x = np.where(normal_statistic > sample_shapiro[0])
+len(normal_statistic[x])/len(normal_statistic)
+```
+
+### Se rechaza la hipotesis nula cuando debio haberse aceptado, falso positivo
+
+
+### Se falla en rechazar la hipotesis nula cuando debio haberse rechazado, positivo falso
+
+```{python}
+
+```
