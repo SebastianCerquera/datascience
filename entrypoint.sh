@@ -32,6 +32,29 @@ run_notebook(){
     jupyter nbconvert --to html "$FILENAME"_out.ipynb
 }
 
+check_git_variables(){
+    if [ -z "$GIT_USERNAME" ] || [ -z "$GIT_EMAIL" ]; then 
+         echo "An user name and email are required"
+         exit 1
+    fi
+}
+
+setup_git_repo(){
+    check_git_variables
+    git config --global user.email "$GIT_EMAIL"
+    git config --global user.name "$GIT_USERNAME"
+}
+
+find_and_setup_git_repos(){
+base_dir=$(pwd) 
+    for git_folder in $(find / -type d -name ".git" 2> /dev/null); do
+        parent=$(dirname $git_folder)
+        cd $parent
+        setup_git_repo
+    done
+    cd $base_dir
+}
+
 if [ "x$1" == "xbash" ]; then
     exec $@
 elif [ "x$1" == "xrun" ]; then
@@ -39,5 +62,6 @@ elif [ "x$1" == "xrun" ]; then
     sleep 60
     run_notebook $2
 else
+    find_and_setup_git_repos
     start_jupyter_gui
 fi
