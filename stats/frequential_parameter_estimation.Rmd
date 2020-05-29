@@ -1,0 +1,141 @@
+---
+jupyter:
+  jupytext:
+    formats: ipynb,Rmd
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.2
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import numpy as np
+from functools import partial
+
+import matplotlib.pyplot as plt
+```
+
+<!-- #region -->
+# Estimación frequentista de parametros
+
+Estoy siguiendo este curso para aprender acerca de inferencia estadistica, Este video toca el tema desde un punto de vista frecuentista.
+
+- https://www.youtube.com/watch?v=4UJc0S8APm4
+
+Dado un parametro $\theta$ y se produce una variable aleatoria, para la cual nuestro estimador genera otra variable aleatoria $\Theta$ que es nuestro valor estimado. El estimador funciona tanto como con valores escalares como con vectores.
+
+<img  src="images/estimator.png"/>
+
+El objetivo es construir un estimador con error ($\Theta$ - $\theta$) tan pequeno como sea posible.
+
+
+<img  src="images/estimator-caracteristics.png"/>
+
+Un buen estimador cumple con las siguientes caracteristicas, el valor de $\theta$ es desconocido, 
+
+- No tiene sesgos: El valor esperado del estimador $E[\Theta]$ se acerca a $\theta$
+- Es consistente: $\Theta_n$ --> $\theta$ 
+- Tiene un mean square error pequeno: 
+
+
+
+El describe 2 metodos para construir un estimador de un parametro:
+
+- Maximun likehood
+- Sample distribution (CLT theorem)
+<!-- #endregion -->
+
+```{python}
+def check_bias(distribution_generator, estimator, N=1000):
+    results = []
+    for i in range(N):
+        results.append(estimator(distribution_generator()))
+    return np.mean(results)
+
+def check_consistency(distribution_generator, estimator, N=1000):
+    return estimator(distribution_generator(N))
+```
+
+## Maximun likehood
+
+```{python}
+
+```
+
+# Sample distribution
+
+Construir un estimador usando el teorema central del limite:
+
+- Verificar que el valor esperado del estimador se apróxime al valor del parametro.
+- Verificar que el valor del estimador mejora y consistente conforme incrementa el número de muestras.
+- Verificar el mean squre error, debería ser más pequeno entre mas datos por la ley de los grandes números.
+
+### Sample mean distribution
+
+El estimador se puede construir con el promedio de los datos de la muestra: $\dfrac{\sum_{n=1}^{N} x_i} N$
+
+
+### Normal distribution
+
+Usar el paquete de numpy para generar muestras de una distribución normal, construir el estimador para la media y verificar los resultados.
+
+```{python}
+MU = 10
+SIGMA = 1
+
+def gen_normal_sample(N, mu=MU, sigma=SIGMA):
+    return np.random.normal(mu, sigma, 10)
+
+def estimate_mean(X):
+    return np.mean(X)
+```
+
+### Normal distribution: Sesgo
+
+```{python}
+MSG = """
+El estimador no presenta 
+"""
+
+samples = list(range(1, 10000, 100))
+expected_values = list(map(lambda e: check_bias(
+    partial(normal_sample, 10), estimate_mean, N=e), samples))
+plt.plot(samples, expected_values, 'o')
+```
+
+### Normal distribution: Consistencia
+
+```{python}
+MSG = """
+El estimado debería acercarcse a teta, pero no lo esta haciendo.
+
+Algo estoy haciendo mal, el dice que el estimador tiene a theta en proababilidad,
+que quiere decir?
+"""
+
+samples = list(range(1, 10000, 100))
+expected_values = list(map(lambda e: check_consistency(
+    gen_normal_sample, estimate_mean, N=e), samples))
+plt.plot(samples, expected_values, 'o')
+```
+
+```{python}
+MSG = """
+Hacer un box plot con la distribución de probabilidad de del estimador con muestras de:
+1, 10, 100, 1000, 10000, 100000.
+"""
+```
+
+### Uniform distribution
+
+
+### Exponential distribution
+
+```{python}
+
+```
