@@ -21,10 +21,16 @@ RUN pip3 install pandas numpy seaborn seasonal
 
 RUN pip3 install fbprophet holidays ijson
 
+RUN pip3 install tensorflow
+
 RUN apt-get update && apt-get install -y git
 RUN pip3 install dvc
 
 RUN pip3 install google-cloud-storage
+
+RUN pip3 install tensorflow
+
+RUN pip3 install statsmodels
 
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
