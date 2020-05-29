@@ -14,6 +14,11 @@ jupyter:
 ---
 
 ```{python}
+import pandas as pd
+import seaborn as sns
+```
+
+```{python}
 import numpy as np
 from functools import partial
 
@@ -57,8 +62,37 @@ def check_bias(distribution_generator, estimator, N=1000):
         results.append(estimator(distribution_generator()))
     return np.mean(results)
 
-def check_consistency(distribution_generator, estimator, N=1000):
-    return estimator(distribution_generator(N))
+def compute_samples_table(distribution_generator, estimator):
+    results = []
+    for i in [1, 10, 100, 1000, 10000]:
+        X = distribution_generator(i)
+        mu = estimator(X)
+        df = pd.DataFrame({'values': X})
+        df.loc[:, "estimate"] = mu
+        df.loc[:, "sample"] = i
+        results.append(df)
+    return pd.concat(results)
+
+def estimators_samples_fixed_N(distribution_generator, estimator, N):
+    results = []
+    for i in [1, 10, 100, 1000, 10000]:
+        estimators = []
+        for j in range(i):
+            mu = estimator(distribution_generator(N))
+            estimators.append(mu)
+        df = pd.DataFrame({'values': estimators})
+        df.loc[:, "sample"] = i
+        results.append(df)
+    return pd.concat(results)
+
+def estimators_samples_table(distribution_generator, estimator):
+    results = []
+    for i in [1, 10, 100, 1000, 10000]:
+        df = estimators_samples_fixed_N(gen_normal_sample, 
+                                        estimate_mean, i)
+        df.loc[:, "N"] = i
+        results.append(df)
+    return pd.concat(results)
 ```
 
 ## Maximun likehood
@@ -108,6 +142,19 @@ expected_values = list(map(lambda e: check_bias(
 plt.plot(samples, expected_values, 'o')
 ```
 
+```{python}
+MSG = """
+Hacer un box plot con la distribución de probabilidad de la muestra con estos tamanos:
+1, 10, 100, 1000, 10000, 100000.
+
+El resultado tiene sentido entre más puntos las distribución tiene menos
+sesgo.
+"""
+
+df = compute_samples_table(gen_normal_sample, estimate_mean)
+sns.boxplot(data=df, y="values", x="sample", showfliers=True)
+```
+
 ### Normal distribution: Consistencia
 
 ```{python}
@@ -119,16 +166,25 @@ que quiere decir?
 """
 
 samples = list(range(1, 10000, 100))
-expected_values = list(map(lambda e: check_consistency(
-    gen_normal_sample, estimate_mean, N=e), samples))
+expected_values = list(map(lambda e: 
+                estimate_mean(gen_normal_sample(e)), samples))
 plt.plot(samples, expected_values, 'o')
 ```
 
 ```{python}
 MSG = """
-Hacer un box plot con la distribución de probabilidad de del estimador con muestras de:
-1, 10, 100, 1000, 10000, 100000.
+Hacer un box plot con la distribución de probabilidad del estimador, la idea es
+generar k muestras de tamano n, graficar la distribución de estas k muestras,
+entre más grande el número k menos varianza debería tener la distribución.
+
+El estimador es consistente, aun con muestras pequenas la distribución
+del estimador tiende hacia el parametro.
 """
+```
+
+```{python}
+df_e = estimators_samples_table(gen_normal_sample, estimate_mean)
+sns.boxplot(data=df_e, y="values", x="sample", hue="N", showfliers=True)
 ```
 
 ### Uniform distribution
