@@ -32,6 +32,9 @@ RUN pip3 install tensorflow
 
 RUN pip3 install statsmodels
 
+## Requerido para usar dvc con ssh
+RUN pip3 install paramiko
+
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
