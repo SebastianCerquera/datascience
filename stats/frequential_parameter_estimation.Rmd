@@ -342,12 +342,12 @@ sns.boxplot(ax=ax, data=df_e, y="values", x="sample", hue="N", showfliers=True)
 
 ```{python}
 MSG = """
-Comparado con las distribución uniforme y normal el error es MUY grande, es como del 10000%
+Aunque puedo ver que hay un sesgo el error es tan pequeño como en el caso de la distribución uniforme.
 """
 ```
 
 ```{python}
-df_e = estimators_samples_table(gen_uniform_sample, estimate_mean)
+df_e = estimators_samples_table(gen_exponential_sample, estimate_mean)
 df_e.loc[:,"parameter"] = MU
 df_e.loc[:,"square_error"] = (df_e["values"] - df_e["parameter"]).apply(lambda e: e**2)
 df_e.head()
@@ -355,8 +355,4 @@ df_e.head()
 
 ```{python}
 df_e[["sample", "square_error"]].groupby(by="sample").describe()
-```
-
-```{python}
-
 ```
