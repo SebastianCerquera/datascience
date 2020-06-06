@@ -55,6 +55,10 @@ El describe 2 metodos para construir un estimador de un parametro:
 - Sample distribution (CLT theorem)
 <!-- #endregion -->
 
+### Preguntas ???
+
+- Que tan pequeño debe ser el MSE? Que es pequeño en este contexto?
+
 ```{python}
 def check_bias(distribution_generator, estimator, N=1000):
     results = []
@@ -88,8 +92,8 @@ def estimators_samples_fixed_N(distribution_generator, estimator, N):
 def estimators_samples_table(distribution_generator, estimator):
     results = []
     for i in [1, 10, 100, 1000, 10000]:
-        df = estimators_samples_fixed_N(gen_normal_sample, 
-                                        estimate_mean, i)
+        df = estimators_samples_fixed_N(distribution_generator, 
+                                        estimator, i)
         df.loc[:, "N"] = i
         results.append(df)
     return pd.concat(results)
@@ -215,15 +219,142 @@ df_e[["sample", "square_error"]].groupby(by="sample").describe()
 ```{python}
 LOW = 10
 MAX = 1
+MU = (MAX + LOW)/2
 
 def gen_uniform_sample(N, lower=LOW, upper=MAX):
-    return np.random.uniform(lower, upper, 10)
+    return np.random.uniform(lower, upper, N)
+```
+
+### Uniform distribution: Sesgo
+
+```{python}
+MSG = """
+El estimador es menos volatil cuando incrementa el número de muestras y no presenta ningún sesgo
+"""
+
+samples = list(range(1, 10000, 100))
+expected_values = list(map(lambda e: check_bias(
+    partial(gen_uniform_sample, 10), estimate_mean, N=e), samples))
+plt.plot(samples, expected_values, 'o')
+```
+
+```{python}
+MSG = """
+Hacer un box plot con la distribución de probabilidad de la muestra con estos tamanos:
+1, 10, 100, 1000, 10000, 100000.
+
+El estimador no presenta ningún sesgo en ocasiones su valor es inferior y en otras superior al paramtero
+"""
+
+df = compute_samples_table(gen_uniform_sample, estimate_mean)
+sns.boxplot(data=df, y="values", x="sample", showfliers=True)
+```
+
+### Uniform distribution: Consistencia
+
+```{python}
+MSG = """
+El estimador mejora de forma considerable conforme incrementa el número de muestras, el parametro esta bn estimado
+aunque la varianza incrementa cuando el tamaño de las muestras es muy pequeño.
+"""
+```
+
+```{python}
+df_e = estimators_samples_table(gen_uniform_sample, estimate_mean)
+fig = plt.figure(figsize=(16, 10))
+ax = fig.add_subplot(1, 1, 1)
+sns.boxplot(ax=ax, data=df_e, y="values", x="sample", hue="N", showfliers=True)
+```
+
+### Uniform distribution: Error
+
+```{python}
+MSG = """
+Lo que yo esperaria es que el mean square error del parametro disminuya conforme incrementa el número de muestras.
+No siempre es el menor sin embargo el valor es más constante entre más muestras, no cambia tanto entre ejecuciones.
+"""
+```
+
+```{python}
+df_e = estimators_samples_table(gen_uniform_sample, estimate_mean)
+df_e.loc[:,"parameter"] = MU
+df_e.loc[:,"square_error"] = (df_e["values"] - df_e["parameter"]).apply(lambda e: e**2)
+df_e.head()
+```
+
+```{python}
+df_e[["sample", "square_error"]].groupby(by="sample").describe()
 ```
 
 ### Exponential distribution
 
 ```{python}
+LAMBDA = 1.0
+MU = 1/LAMBDA
 
+def gen_exponential_sample(N, lbda=LAMBDA):
+    return np.random.exponential(lbda, N)
+```
+
+### Exponential distribution: Sesgo
+
+```{python}
+MSG = """
+El estimador es menos volatil cuando incrementa el número de muestras y no presenta ningún sesgo
+"""
+
+samples = list(range(1, 10000, 100))
+expected_values = list(map(lambda e: check_bias(
+    partial(gen_exponential_sample, 10), estimate_mean, N=e), samples))
+plt.plot(samples, expected_values, 'o')
+```
+
+```{python}
+MSG = """
+Hacer un box plot con la distribución de probabilidad de la muestra con estos tamanos:
+1, 10, 100, 1000, 10000, 100000.
+
+Me da la impresión que el estimador tienen un sesgo positivo
+"""
+
+df = compute_samples_table(gen_exponential_sample, estimate_mean)
+sns.boxplot(data=df, y="values", x="sample", showfliers=True)
+```
+
+### Exponential distribution: Consistencia
+
+```{python}
+MSG = """
+El estimador no funciona bn con muestras de tamaño muy pequeño, aún cuando incrementa el número de muestras el valor
+estimado del parametro se aleja del valor real, con muestras de tamaño 100 funciona bn aún cuando el número de muestras
+es pequeño.
+"""
+```
+
+```{python}
+df_e = estimators_samples_table(gen_exponential_sample, estimate_mean)
+fig = plt.figure(figsize=(16, 10))
+ax = fig.add_subplot(1, 1, 1)
+sns.boxplot(ax=ax, data=df_e, y="values", x="sample", hue="N", showfliers=True)
+```
+
+### Exponential distribution: Error
+
+```{python}
+MSG = """
+Comparado con las distribución uniforme y normal el error es MUY grande, es como del 10000%
+"""
+```
+
+```{python}
+df_e = estimators_samples_table(gen_uniform_sample, estimate_mean)
+df_e.loc[:,"parameter"] = MU
+df_e.loc[:,"square_error"] = (df_e["values"] - df_e["parameter"]).apply(lambda e: e**2)
+df_e.head()
+```
+
+```{python}
+df_e[["sample", "square_error"]].groupby(by="sample").describe()
 ```
 
 ```{python}
