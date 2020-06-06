@@ -113,6 +113,10 @@ Construir un estimador usando el teorema central del limite:
 
 El estimador se puede construir con el promedio de los datos de la muestra: $\dfrac{\sum_{n=1}^{N} x_i} N$
 
+```{python}
+def estimate_mean(X):
+    return np.mean(X)
+```
 
 ### Normal distribution
 
@@ -123,22 +127,19 @@ MU = 10
 SIGMA = 1
 
 def gen_normal_sample(N, mu=MU, sigma=SIGMA):
-    return np.random.normal(mu, sigma, 10)
-
-def estimate_mean(X):
-    return np.mean(X)
+    return np.random.normal(mu, sigma, N)
 ```
 
 ### Normal distribution: Sesgo
 
 ```{python}
 MSG = """
-El estimador no presenta 
+El estimador no presenta es menos volatil cuando incrementa el número de muestras
 """
 
 samples = list(range(1, 10000, 100))
 expected_values = list(map(lambda e: check_bias(
-    partial(normal_sample, 10), estimate_mean, N=e), samples))
+    partial(gen_normal_sample, 10), estimate_mean, N=e), samples))
 plt.plot(samples, expected_values, 'o')
 ```
 
@@ -184,13 +185,46 @@ del estimador tiende hacia el parametro.
 
 ```{python}
 df_e = estimators_samples_table(gen_normal_sample, estimate_mean)
-sns.boxplot(data=df_e, y="values", x="sample", hue="N", showfliers=True)
+fig = plt.figure(figsize=(16, 10))
+ax = fig.add_subplot(1, 1, 1)
+sns.boxplot(ax=ax, data=df_e, y="values", x="sample", hue="N", showfliers=False)
+```
+
+### Normal distribution: Error
+
+```{python}
+MSG = """
+Lo que yo esperaria es que el mean square error del parametro disminuya conforme incrementa el número de muestras.
+No siempre es el menor sin embargo el valor es más constante entre más muestras, no cambia tanto entre ejecuciones.
+"""
+```
+
+```{python}
+df_e = estimators_samples_table(gen_normal_sample, estimate_mean)
+df_e.loc[:,"parameter"] = MU
+df_e.loc[:,"square_error"] = (df_e["values"] - df_e["parameter"]).apply(lambda e: e**2)
+df_e.head()
+```
+
+```{python}
+df_e[["sample", "square_error"]].groupby(by="sample").describe()
 ```
 
 ### Uniform distribution
 
+```{python}
+LOW = 10
+MAX = 1
+
+def gen_uniform_sample(N, lower=LOW, upper=MAX):
+    return np.random.uniform(lower, upper, 10)
+```
 
 ### Exponential distribution
+
+```{python}
+
+```
 
 ```{python}
 
