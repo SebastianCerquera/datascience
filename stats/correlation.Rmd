@@ -138,6 +138,11 @@ El desarrollo analitico requiere que las variables sean independientes
   
 Las series que usa el man del video estan muy simples, la idea es usar una representación discreta de la sinuidal del ejemple continuo.
 
+
+## Desarrollo analitico vs desarrollon númerico
+
+Las series que usa el man del video estan muy simples, la idea es usar una representación discreta de la sinuidal del ejemple continuo.
+
 ```{python}
 N = 1000
 
@@ -177,44 +182,60 @@ MSG = """
 Este es el calculo usando la solución númerica: {}
 """
 
-nominator = np.sum( X(t)*X(t+T) )
-denominator = ( np.sum(X(t)**2) * np.sum(X(t + T)**2) )**0.5
+nominator = np.mean( X(t)*X(t+T) )
 
-print(MSG.format(nominator/denominator))
+print(MSG.format(nominator))
+
+"""
+El valor esperado del desarrollo analitico y númerico estan próximos.
+"""
 ```
 
-### Usar el valor esperado no funciona
+## Cambiar función de agregación
 
-<img src="images/example-integral.png"/>
+En el ejemplo anterior use la media para comparar el caso continuo con el discreto, me gustaría en vez de usar el
+valor esperado probar con la sumatoria de la función para poder aplicar el mismo coeficiente de correlación del caso discreto con variables continuas
 
-<img src="images/example-integral-2.png"/>
-
-
-
+<img src="images/example-integral-4.png"/>
 
 
 #### La función analitica queda así
 
-$\sum_{n=0}^{N-1}A^2$ · $\dfrac{sin(wcT)}{2wc}$ · ($\dfrac{sin(2\theta)cos(wcT)}{wc} + \dfrac{cos(2\theta)sin(wcT)}{wc}$)
+$\int{A^2}$ · $\left( \dfrac{t}{2}cos(T wc) - \dfrac{sin(2\theta + wc(2t +T))}{4wc}\right)$
+
+Debido a que T es 0
+
+$\int{A^2}$ · $\left( \dfrac{t}{2} - \dfrac{sin(2\theta + wc(2t))}{4wc}\right)$
+
+Debido a que wc es 1
+
+$\int{A^2}$ · $\left( \dfrac{t}{2} - \dfrac{sin(2\theta + 2t)}{4}\right)$
+
+$\int{A^2}$ · $\left( \dfrac{t}{2} - \dfrac{sin(2(t + \theta))}{4}\right)$
 
 ```{python}
+exp_1 = np.sum(A**2)
+exp_2 = t[-1]/2
+
+## Metí elpromedio porque no se como reducir el teta luego de haber integrado
+exp_3 = np.mean(np.sin(2*(t[-1] + Th))/4)
+
+
 MSG = """
-Este es el calculo usando la solución analitica: {}
+Los resultados estan muy alejados, estoy haciendo algo mal con la variable aleatoria {}
 """
 
-exp_1 = np.sum(A**2)
-exp_2 = np.sum(np.sin(wc*T)/2*wc)
-exp_3 = np.sum((np.sin(2*Th)*np.cos(wc*T)/wc) + (np.cos(2*Th)*np.sin(wc*T)/wc))
+print(MSG.format((exp_1 * (exp_2 - exp_3))))
 
-print(MSG.format(exp_1*exp_2*exp_3))
-```
 
-```{python}
-np.sin(wc*T)/2*wc
-```
+MSG = """
+Este es el calculo discreto de la función con el ruido aleatorio {} el resultados es 10 veces menor que el obtenido por la vía analitica.
+"""
 
-```{python}
-np.sum(A**2)
+nominator = np.sum( X(t)*X(t+T) )
+
+print(MSG.format(nominator))
+
 ```
 
 ```{python}
