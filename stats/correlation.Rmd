@@ -149,7 +149,7 @@ N = 1000
 A = np.random.normal(0, 1, N)
 Th = np.random.uniform(-np.pi, np.pi, N)
 wc = 1
-X = lambda t: A*np.sin(wc*t + Th) 
+X = lambda t: A*np.sin(wc*t + Th)
 ```
 
 ```{python}
@@ -236,6 +236,109 @@ nominator = np.sum( X(t)*X(t+T) )
 
 print(MSG.format(nominator))
 
+```
+
+```{python}
+
+```
+
+## Verificar usando una función mas simple
+
+Voy a usar una recta con pendiente 1 para empezar
+
+```{python}
+N = 1000
+
+A = np.random.normal(0, 1, N)
+wc = 1
+X = lambda t: [A[i]*wc*t[i] for i in range(t.shape[0])]
+```
+
+```{python}
+t = np.arange(0, 6*np.pi, 6*np.pi/N)
+t_ticks = np.arange(0, 6*np.pi, 6*np.pi/10)
+```
+
+```{python}
+fig = plt.figure(figsize=(15,8))
+ax = fig.add_subplot(1, 1, 1)
+ax.plot(t, X(t))
+ax.set_xticks(t_ticks)
+plt.show()
+```
+
+```{python}
+#### Autocorrelación: Gráfica
+
+#### Las funciones solo se parecen cuando tau es 0
+T = 1
+
+## Esta calculando la integral discreta de la función de correlación
+discrete_corr = np.array([ X(t)[i] * X(t)[i+T] for i in range(t.shape[0] - T) ])
+
+## Al momento de modelarlo tengo que entender la variable aleatoria como si fueran 2
+continuous_corr =  np.array([ A[i+T]* A[i] * wc**2 * t[i]*t[i + T]  for i in range(t.shape[0] - T) ])
+
+fig = plt.figure(figsize=(15,8))
+
+ax = fig.add_subplot(1, 2, 1)
+ax.plot(t[T:], discrete_corr)
+ax.set_xticks(t_ticks)
+
+ax = fig.add_subplot(1, 2, 2)
+ax.plot(t[T:], continuous_corr)
+ax.set_xticks(t_ticks)
+
+
+plt.show()
+```
+
+```{python}
+#### Autocorrelación: Gráfica
+
+#### Las funciones solo se parecen cuando tau es 0
+T = 0
+
+## Esta calculando la integral discreta de la función de correlación
+discrete_corr = np.cumsum(np.array([ X(t)[i] * X(t)[i+T] for i in range(t.shape[0] - T) ]) * np.mean(t[1:] - t[:-1]))
+
+## No he podido añadirle el ruido a la versión continua
+continuous_corr = np.array([ A[i]*A[i + T] * wc**2 * (t[i]**3/3 + (t[i]**2 * T)/2)  for i in range(t.shape[0] - T) ])
+
+# discrete_corr = np.array([ X(t)[i] * X(t+T)[i] for i in range(t.shape[0]) ])
+# continuous_corr =  np.array([ A[i]**2 * ( (t[i]**3)/3 + (t[i]**2 * T)/2 ) for i in range(t.shape[0]) ])
+
+fig = plt.figure(figsize=(15,8))
+
+ax = fig.add_subplot(1, 2, 1)
+ax.plot(t[T:], discrete_corr)
+ax.set_xticks(t_ticks)
+
+ax = fig.add_subplot(1, 2, 2)
+ax.plot(t[T:], continuous_corr)
+ax.set_xticks(t_ticks)
+
+
+plt.show()
+```
+
+```{python}
+#### Autocorrelación suma de la función
+
+MSG = """
+Este es el calculo usando la solución analitica: {}
+"""
+nominator = continuous_corr[-1] - continuous_corr[0]
+
+print(MSG.format(corr))
+
+
+MSG = """
+Este es el calculo usando la solución númerica: {}
+"""
+
+nominator = discrete_corr[-1] - discrete_corr[0]
+print(MSG.format(nominator))
 ```
 
 ```{python}
