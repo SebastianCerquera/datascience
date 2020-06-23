@@ -1,10 +1,14 @@
-FROM ubuntu:20.04
+FROM tensorflow/tensorflow:latest-gpu-jupyter
 
 USER root
 
 RUN apt-get update && apt-get install -y vim jq curl python3 python3-pip
 
-RUN pip3 install jupyter jupytext nltk lightgbm imblearn graphviz bash_kernel awscli boto3 colour shapely python-dotenv
+RUN pip3 install --upgrade pip
+
+#RUN pip3 install jupyter jupytext nltk lightgbm imblearn graphviz bash_kernel awscli boto3 colour shapely python-dotenv
+
+RUN pip3 install jupytext nltk lightgbm imblearn graphviz bash_kernel awscli boto3 colour shapely python-dotenv
 
 RUN pip3 install gmaps
 
@@ -34,6 +38,11 @@ RUN pip3 install statsmodels
 
 ## Requerido para usar dvc con ssh
 RUN pip3 install paramiko
+RUN pip3 install pillow
+
+RUN pip3 install tensorflow-gpu
+
+RUN pip3 install keras
 
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
