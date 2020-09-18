@@ -44,6 +44,10 @@ RUN pip3 install tensorflow-gpu
 
 RUN pip3 install keras
 
+RUN pip3 install mlxtend
+
+RUN pip3 install xgboost
+
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
