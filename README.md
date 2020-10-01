@@ -1,13 +1,13 @@
 # datascience
 
 ## build
-VERSION=2.0.1
+VERSION=2.0.2
 sudo docker build -t pandora/jupyter:$VERSION .
 sudo docker tag pandora/jupyter:$VERSION thepandorasys/jupyter-tools:$VERSION
 sudo docker push thepandorasys/jupyter-tools:$VERSION
 
 ## run jupyter GUI
-VERSION=2.0.1
+VERSION=2.0.2
 JUPYTER_SOURCES=$HOME/sources/
  
 sudo docker run --rm -p 9999:8888 -v $JUPYTER_SOURCES:/home/runner/notebooks \
