@@ -48,6 +48,14 @@ RUN pip3 install mlxtend
 
 RUN pip3 install xgboost
 
+RUN pip3 install kmodes plotly catboost seaborn
+
+RUN pip3 install bayesian-optimization
+
+RUN pip3 install dask[all] cloudpickle
+
+RUN pip3 install dask[distributed]
+
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
