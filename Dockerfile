@@ -56,6 +56,10 @@ RUN pip3 install dask[all] cloudpickle
 
 RUN pip3 install dask[distributed]
 
+RUN pip3 install dask[dataframe]
+
+RUN pip3 install bokeh
+
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
