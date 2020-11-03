@@ -60,6 +60,8 @@ RUN pip3 install dask[dataframe]
 
 RUN pip3 install bokeh
 
+RUN pip3 install missingno wordcloud folium geopy
+
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
 
