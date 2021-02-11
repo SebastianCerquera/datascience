@@ -64,7 +64,9 @@ RUN pip3 install missingno wordcloud folium geopy
 
 RUN pip3 install nbparameterise
 
-RUN pip3 install uvicorn fastapi aiofiles
+RUN pip3 install uvicorn fastapi
+
+RUN pip3 install aiofiles
 
 COPY run_notebooks.py /opt/run_notebooks.py
 RUN chmod +x /opt/run_notebooks.py
